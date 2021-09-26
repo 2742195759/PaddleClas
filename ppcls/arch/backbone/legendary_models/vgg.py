@@ -111,7 +111,7 @@ class VGGNet(TheseusLayer):
         model: nn.Layer. Specific VGG model depends on args.
     """
 
-    def __init__(self, config, stop_grad_layers=0, class_num=1000):
+    def __init__(self, config, stop_grad_layers=0, class_num=1000, return_patterns=None):
         super().__init__()
 
         self.stop_grad_layers = stop_grad_layers
@@ -137,6 +137,9 @@ class VGGNet(TheseusLayer):
         self.fc1 = Linear(7 * 7 * 512, 4096)
         self.fc2 = Linear(4096, 4096)
         self.fc3 = Linear(4096, class_num)
+        if return_patterns is not None:
+            self.update_res(return_patterns)
+            self.register_forward_post_hook(self._return_dict_hook)
 
     def forward(self, inputs):
         x = self.conv_block_1(inputs)
